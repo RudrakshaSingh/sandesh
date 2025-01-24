@@ -8,15 +8,11 @@ const userSchema = new mongoose.Schema(
          firstname: {
             type: String,
             required: true,
-            minlength: [3, "First name must be at least 3 characters long"],
-            maxlength: [50, "First name must be at most 50 characters long"],
             trim: true,
             lowercase: true,
          },
          lastname: {
             type: String,
-            minlength: [3, "Last name must be at least 3 characters long"],
-            maxlength: [50, "Last name must be at most 50 characters long"],
             trim: true,
             lowercase: true,
          },
@@ -25,36 +21,13 @@ const userSchema = new mongoose.Schema(
          type: String,
          required: true,
          unique: true,
-         minlength: [5, "Email must be at least 5 characters long"],
-         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, "Please enter a valid email"],
          trim: true,
          lowercase: true,
-      },
-      address: {
-         type: String,
-         required: true,
-         trim: true,
-      },
-      mobileNumber: {
-         type: Number,
-         required: true,
-         unique: true,
-         trim: true,
-         maxlength: [10, "Mobile number must be at most 10 digits long"],
-         minlength: [10, "Mobile number must be at least 10 digits long"],
       },
       password: {
          type: String,
          required: true,
-         minlength: [6, "Password must be at least 6 characters long"],
-         maxlength: [20, "Password must be at most 20 characters long"],
          select: false,
-         validate: {
-            validator: function (v) {
-               return /(?=.*[A-Z])(?=.*[!@#$&*])/.test(v);
-            },
-            message: (props) => `${props.value} must contain at least one uppercase letter and one symbol`,
-         },
       },
       confirmPassword: {
          type: String,
@@ -65,21 +38,6 @@ const userSchema = new mongoose.Schema(
             },
             message: "Passwords do not match",
          },
-      },
-      profileImage: {
-         type: String,
-         default:"https://banner2.cleanpng.com/20190211/eet/kisspng-computer-icons-scalable-vector-graphics-user-profi-login-user-name-svg-png-icon-free-download-21379-1713906519828.webp",
-      },
-      otp: {
-         type: Number,
-         select: false,
-      },
-      otpExpiresAt: {
-         type: Date,
-         select: false,
-      },
-      refreshToken: {
-         type: String,
       },
    },
    {

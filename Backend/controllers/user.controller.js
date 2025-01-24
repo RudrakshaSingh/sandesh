@@ -6,6 +6,7 @@ import asyncHandler from "../utils/AsyncHandler";
 import { ApiError } from "../utils/ApiError.js";
 import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import createUser from "../services/user.service.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
    const errors = validationResult(req);
@@ -16,14 +17,14 @@ export const registerUser = asyncHandler(async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
    }
 
-   const { fullname, email, password, confirmPassword, mobileNumber, address } = req.body;
+   const { fullname, email, password, confirmPassword} = req.body;
 
-   const isUserAlreadyExists = await userModel.findOne({ $or: [{ email }, { mobileNumber }] });
+   const isUserAlreadyExists = await userModel.findOne({email});
    if (isUserAlreadyExists) {
       throw new ApiError(400, "User email or mobilenumber already exists");
    }
 
-  //  const profileImageLocalPath = req.file?.path;
+   //  const profileImageLocalPath = req.file?.path;
   //  if (profileImageLocalPath) {
   //     const profileImage = await uploadOnCloudinary(profileImageLocalPath);
   //     if (!profileImage) {
@@ -31,28 +32,30 @@ export const registerUser = asyncHandler(async (req, res) => {
   //     }
   //  }
 
+
+
    const hashedPassword = await userModel.hashPassword(password);
 
    try {
-      const user = await userService.createUser({
+      console.log("h");
+      
+      const user = await createUser({
          firstname: fullname.firstname,
          lastname: fullname.lastname,
          email,
          password: hashedPassword,
-         confirmPassword,
-         mobileNumber,
-         address,
-        //  profileImage:
-        //     profileImage?.url ||
-        //     "https://banner2.cleanpng.com/20190211/eet/kisspng-computer-icons-scalable-vector-graphics-user-profi-login-user-name-svg-png-icon-free-download-21379-1713906519828.webp",
+         confirmPassword:hashedPassword
+        
       });
+      console.log("hd");
+
 
       const token = user.generateAuthToken(); //give id of user
       return res.status(201).json(
-        new ApiResponse(true, "User created successfully", { token, user })
+        new ApiResponse(201, "User created successfully", { token, user })
       );
    } catch (error) {
-      throw new ApiError(400, "Internal Server Error  in registerUser", error);
+      throw new ApiError(400,"error in registering", error.message);
    }
 });
 
