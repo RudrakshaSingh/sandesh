@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema(
          trim: true,
          lowercase: true,
       },
+      address: {
+         type: String,
+         required: true,
+         trim: true,
+      },
       mobileNumber: {
          type: Number,
          required: true,
@@ -63,8 +68,7 @@ const userSchema = new mongoose.Schema(
       },
       profileImage: {
          type: String,
-         default:
-            "https://banner2.cleanpng.com/20190211/eet/kisspng-computer-icons-scalable-vector-graphics-user-profi-login-user-name-svg-png-icon-free-download-21379-1713906519828.webp",
+         default:"https://banner2.cleanpng.com/20190211/eet/kisspng-computer-icons-scalable-vector-graphics-user-profi-login-user-name-svg-png-icon-free-download-21379-1713906519828.webp",
       },
       otp: {
          type: Number,

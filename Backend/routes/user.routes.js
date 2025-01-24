@@ -1,7 +1,7 @@
 import express from 'express';
 import {body} from 'express-validator';
 import { Router } from 'express';
-import { getUserProfile, logoutUser, registerUser, loginUser } from '../controllers/user.controller.js';
+import {  registerUser,  } from '../controllers/user.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
 
