@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
-export default authUser = async (req, res, next) => {
+const authUser = async (req, res, next) => {
   try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
     
@@ -27,3 +27,5 @@ export default authUser = async (req, res, next) => {
     return res.status(401).json({ message: "Server error middleware" });
   }
 };
+
+export default authUser;

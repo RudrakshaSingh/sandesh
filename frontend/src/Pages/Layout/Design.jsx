@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
-import Navbar from '../Component/Layout/Navbar';
-import Footer from '../Component/Layout/Footer';
+import Navbar from '../../Component/Layout/Navbar';
+import Footer from '../../Component/Layout/Footer';
 
 const Design = () => {
   return (

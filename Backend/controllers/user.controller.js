@@ -1,7 +1,7 @@
 import userModel from '../models/user.model.js';
 import userService from '../services/user.service.js';
 import { validationResult } from 'express-validator';//the validation in route,if it lead to to wrong value and need to perform action on it
-const blackListTokenModel = require("../models/blackListToken.model");
+import blackListTokenModel from "../models/blackListToken.model.js";
 
 export const registerUser = async (req, res, next) => {
   const errors = validationResult(req);

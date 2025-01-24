@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Navbar from '../Component/Layout/Navbar';
+import Navbar from '../../Component/Layout/Navbar';
 import { PenTool, Image, Type, Video, Palette, Download, Save } from 'lucide-react';
-import Footer from '../Component/Layout/Footer';
+import Footer from '../../Component/Layout/Footer';
 
 const CreateInvitation = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('blank');

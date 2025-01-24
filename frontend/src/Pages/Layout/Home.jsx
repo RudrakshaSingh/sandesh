@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Video, PenTool, Heart, Leaf, IndianRupee } from 'lucide-react';
-import Navbar from '../Component/Layout/Navbar';
-import Footer from '../Component/Layout/Footer';
+import Navbar from '../../Component/Layout/Navbar';
+import Footer from '../../Component/Layout/Footer';
 
 const Home = () => {
   return (
