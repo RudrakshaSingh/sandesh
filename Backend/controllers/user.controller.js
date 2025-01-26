@@ -2,50 +2,58 @@ import userModel from "../models/user.model.js";
 import userService from "../services/user.service.js";
 import { validationResult } from "express-validator"; //the validation in route,if it lead to to wrong value and need to perform action on it
 import blackListTokenModel from "../models/blackListToken.model.js";
-import asyncHandler from "../utils/AsyncHandler";
+import asyncHandler from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
-import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+import  uploadOnCloudinary  from "../utils/Cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import createUser from "../services/user.service.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
+   console.log("Request Body:", req.body); // Add this line for debugging
    const errors = validationResult(req);
-   
 
    //if something if wrong the give error in routes comes in errors.array
    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
    }
 
-   const { fullname, email, password, confirmPassword} = req.body;
+   const { fullname, email, password, confirmPassword, address} = req.body;
 
    const isUserAlreadyExists = await userModel.findOne({email});
    if (isUserAlreadyExists) {
-      throw new ApiError(400, "User email or mobilenumber already exists");
+      throw new ApiError(400, "User email already exists");
    }
 
-   //  const profileImageLocalPath = req.file?.path;
-  //  if (profileImageLocalPath) {
-  //     const profileImage = await uploadOnCloudinary(profileImageLocalPath);
-  //     if (!profileImage) {
-  //        throw new ApiError(400, "Error uploading profile image");
-  //     }
-  //  }
-
-
+   if (password !== confirmPassword) {
+      throw new ApiError(400, "Password and confirm password do not match");
+   }
 
    const hashedPassword = await userModel.hashPassword(password);
 
+   // Correct ProfileImage path (use req.file)
+   const ProfilePictureLocalPath = req.file?.path;
+   if (!ProfilePictureLocalPath) {
+     return res.status(400).json({ error: "Profile picture is required" });
+   }
+    // Upload to Cloudinary
+   const profileImage = await uploadOnCloudinary(ProfilePictureLocalPath);
+    if (!profileImage) {
+      return res.status(400).json({ error: "Error uploading profile picture" });
+    }
+
    try {
       console.log("h");
+      console.log(profileImage.url);
+      
       
       const user = await createUser({
          firstname: fullname.firstname,
          lastname: fullname.lastname,
          email,
          password: hashedPassword,
-         confirmPassword:hashedPassword
-        
+         confirmPassword:hashedPassword,
+         address,
+         profileImage: profileImage.url,
       });
       console.log("hd");
 

@@ -39,6 +39,14 @@ const userSchema = new mongoose.Schema(
             message: "Passwords do not match",
          },
       },
+      address: {
+         type: String,
+         trim: true,
+      },
+      profileImage: {
+         type: String,
+         required: true,
+      },
    },
    {
       timestamps: true,
