@@ -32,19 +32,19 @@ export const registerUser = asyncHandler(async (req, res) => {
 
    // Correct ProfileImage path (use req.file)
    const ProfilePictureLocalPath = req.file?.path;
-   if (!ProfilePictureLocalPath) {
-     return res.status(400).json({ error: "Profile picture is required" });
+   let profileImageUrl = "https://res.cloudinary.com/divxsdt9u/image/upload/v1737870584/sandesh/grux0cmc3bkxxfwqy7ym.png";
+   if (ProfilePictureLocalPath) {
+      // Upload to Cloudinary
+      const profileImage = await uploadOnCloudinary(ProfilePictureLocalPath);
+      if (!profileImage) {
+         return res.status(400).json({ error: "Error uploading profile picture" });
+      }
+      profileImageUrl = profileImage.url;
    }
-    // Upload to Cloudinary
-   const profileImage = await uploadOnCloudinary(ProfilePictureLocalPath);
-    if (!profileImage) {
-      return res.status(400).json({ error: "Error uploading profile picture" });
-    }
 
    try {
       console.log("h");
-      console.log(profileImage.url);
-      
+      console.log(profileImageUrl);
       
       const user = await createUser({
          firstname: fullname.firstname,
@@ -53,10 +53,9 @@ export const registerUser = asyncHandler(async (req, res) => {
          password: hashedPassword,
          confirmPassword:hashedPassword,
          address,
-         profileImage: profileImage.url,
+         profileImage: profileImageUrl,
       });
       console.log("hd");
-
 
       const token = user.generateAuthToken(); //give id of user
       return res.status(201).json(
