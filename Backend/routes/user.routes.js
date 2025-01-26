@@ -2,6 +2,7 @@ import express from "express";
 import { body } from "express-validator";
 import { registerUser, verifyCodeVerificationUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import authUser from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -52,6 +53,6 @@ router.post(
 	registerUser
 );
 
-router.post("/otp", verifyCodeVerificationUser);
+router.post("/otp",authUser, verifyCodeVerificationUser);
 
 export default router;

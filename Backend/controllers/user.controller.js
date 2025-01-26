@@ -1,5 +1,4 @@
 import userModel from "../models/user.model.js";
-import userService from "../services/user.service.js";
 import { validationResult } from "express-validator"; //the validation in route,if it lead to to wrong value and need to perform action on it
 import blackListTokenModel from "../models/blackListToken.model.js";
 import asyncHandler from "../utils/AsyncHandler.js";
@@ -7,6 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import uploadOnCloudinary from "../utils/Cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import createUser from "../services/user.service.js";
+import sendSms from "../utils/sendSms.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
 	const errors = validationResult(req);
@@ -69,36 +69,44 @@ export const registerUser = asyncHandler(async (req, res) => {
       const userObject = user.toObject();
       delete userObject.verifyCode;
 
-		console.log("hd");
+      sendSms(user.mobileNumber, user.fullname.firstname, user.fullname.lastname, verifyCode);
 
 		const token = user.generateAuthToken(); //give id of user
-		return res.status(201).json(new ApiResponse(201, "User created successfully", { token, user:userObject }));
+
+		// Set token in cookie
+		res.cookie('token', token, {
+			httpOnly: true,
+			maxAge: 24 * 60 * 60 * 1000 // 1 day
+		});
+
+		return res.status(201).json(new ApiResponse(201, "User created successfully", { user: userObject }));
 	} catch (error) {
 		throw new ApiError(400, "error in registering", error.message);
 	}
 });
 
 export const verifyCodeVerificationUser = asyncHandler(async (req, res) => {
-	const { mobileNumber, verifyCode } = req.body;
-	const user = await userModel.findOne({ mobileNumber }).select('+verifyCode');
+	const { verifyCode } = req.body;
+	const user = await userModel.findById(req.user._id).select('+verifyCode');
 	if (!user) {
-		throw new ApiError(400, "User mobile number not found");
+		throw new ApiError(400, "User not found");
 	}
    
 	if (user.verifyCode !== verifyCode) {
-      
 		throw new ApiError(400, "Invalid OTP");
 	}
 	user.isVerified = true;
 
-	 // Use $unset to remove the verifyCode field from the document in the database
-    await user.updateOne({ $unset: { verifyCode: 1 } });
+	// Use $unset to remove the verifyCode field from the document in the database
+	await user.updateOne({ $unset: { verifyCode: 1 } });
 
-    // Save other changes like isVerified
-    await user.save();
+	// Save other changes like isVerified
+	await user.save();
 
-	const updatedUser = await userModel.findOne({ mobileNumber });
+	const updatedUser = await userModel.findById(req.user._id);
 
+	// Clear the token cookie
+	res.clearCookie('token');
 
-	return res.status(200).json(new ApiResponse(200, "User verified successfully",updatedUser));
+	return res.status(200).json(new ApiResponse(200, "User verified successfully", updatedUser));
 });
