@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema(
          type: String,
          required: true,
       },
+      mobileNumber: {
+         type:Number,
+         required: true,
+      },
       verifyCode: {
          type: Number,
          select: false,

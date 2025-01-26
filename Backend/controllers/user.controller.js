@@ -17,7 +17,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
    }
 
-   const { fullname, email, password, confirmPassword, address} = req.body;
+   const { fullname, email, password, confirmPassword, address,mobileNumber} = req.body;
 
    const isUserAlreadyExists = await userModel.findOne({email});
    if (isUserAlreadyExists) {
@@ -32,7 +32,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
    // Correct ProfileImage path (use req.file)
    const ProfilePictureLocalPath = req.file?.path;
-   let profileImageUrl = "https://res.cloudinary.com/divxsdt9u/image/upload/v1737870584/sandesh/grux0cmc3bkxxfwqy7ym.png";
+   let profileImageUrl = process.env.DEFAULT_PROFILE_IMAGE_URL;
    if (ProfilePictureLocalPath) {
       // Upload to Cloudinary
       const profileImage = await uploadOnCloudinary(ProfilePictureLocalPath);
@@ -54,6 +54,7 @@ export const registerUser = asyncHandler(async (req, res) => {
          confirmPassword:hashedPassword,
          address,
          profileImage: profileImageUrl,
+         mobileNumber
       });
       console.log("hd");
 
@@ -66,41 +67,3 @@ export const registerUser = asyncHandler(async (req, res) => {
    }
 });
 
-// export const loginUser = async (req, res, next) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return res.status(400).json({ errors: errors.array() });
-//   }
-
-//   const { email, password } = req.body;
-
-//   const user = await userModel.findOne({ email }).select("+password");
-//   if (!user) {
-//     return res.status(401).json({ message: "Invalid email or password" });
-//   }
-
-//   const isMatch = await user.comparePassword(password);
-//   if (!isMatch) {
-//     return res.status(401).json({ message: "Invalid email or password" });
-//   }
-
-//   const token = user.generateAuthToken();
-
-//   res.cookie("token", token);
-
-//   res.status(200).json({ token, user });
-// };
-
-// export const getUserProfile = async (req, res, next) => {
-//   res.status(200).json(req.user);//taken from token in middleware
-// };
-
-// //logout user
-// export const logoutUser = async (req, res, next) => {
-//   res.clearCookie("token");
-//   const token = req.cookies.token || req.headers.authorization.split(" ")[1];
-
-//   await blackListTokenModel.create({ token });//dont need to send createdat
-
-//   res.status(200).json({ message: "Logged out successfull" });
-// };

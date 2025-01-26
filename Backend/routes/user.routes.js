@@ -55,17 +55,5 @@ router.post(
    registerUser
  );
 
-// router.post(
-//   "/login",
-//   [
-//     body("email").isEmail().withMessage("Invalid Email"),
-//     body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
-//   ],
-//   loginUser
-// );
-
-// router.get("/profile", authMiddleware.authUser, getUserProfile);
-
-// router.get("/logout", authMiddleware.authUser, logoutUser);
 
 export default router;
