@@ -30,16 +30,6 @@ const userSchema = new mongoose.Schema(
          required: true,
          select: false,
       },
-      confirmPassword: {
-         type: String,
-         required: true,
-         validate: {
-            validator: function (v) {
-               return v === this.password;
-            },
-            message: "Passwords do not match",
-         },
-      },
       address: {
          type: String,
          trim: true,
@@ -49,18 +39,16 @@ const userSchema = new mongoose.Schema(
          required: true,
       },
       mobileNumber: {
-         type:Number,
+         type:String,
          required: true,
       },
       verifyCode: {
-         type: Number,
+         type: String,
          select: false,
-
       },
       isVerified: {
          type: Boolean,
          default: false,
-         select: false,
       },
    },
    {
@@ -85,33 +73,34 @@ userSchema.statics.hashPassword = async function (password) {
 };
 
 // Post-save hook to delete user and image if not verified
-userSchema.post('save', function () {
-   const user = this;  // Access the current user instance
-
+userSchema.methods.deleteUserIfNotVerified = async function () {
    console.log("deleteUserIfNotVerified started");
 
    // Set timeout for 1 minute (60,000 ms)
    setTimeout(async () => {
-     if (!user.isVerified) {
-       // Use the deleteOnCloudinary function to delete the image
-       try {
-         const deleteResponse = await deleteOnCloudinary(user.profileImage);  // Use the imported function
-         console.log(`Profile image deleted from Cloudinary: ${deleteResponse}`);
-       } catch (error) {
-         console.error("Error deleting image from Cloudinary:", error);
-       }
+      const user = await userModel.findById(this._id);
+      // Check if user is already verified
+      if (!user.isVerified) {
+         try {
+            // Use the deleteOnCloudinary function to delete the image
+            const deleteResponse = await deleteOnCloudinary(user.profileImage);  // Use the imported function
+            console.log(`Profile image deleted from Cloudinary: ${deleteResponse}`);
+         } catch (error) {
+            console.error("Error deleting image from Cloudinary:", error);
+         }
 
-       // Delete the user document using deleteOne (recommended over remove)
-       try {
-         await user.deleteOne(); // Changed from remove() to deleteOne()
-         console.log(`User ${user.email} deleted due to non-verification.`);
-       } catch (error) {
-         console.error("Error deleting user:", error);
-       }
-     }
+         // Delete the user document using deleteOne (recommended over remove)
+         try {
+            await user.deleteOne(); // Changed from remove() to deleteOne()
+            console.log(`User ${user.email} deleted due to non-verification.`);
+         } catch (error) {
+            console.error("Error deleting user:", error);
+         }
+      } else {
+         console.log(`User ${user.email} is verified, no need for deletion.`);
+      }
    }, 60000); // 1 minute in milliseconds
-});
-
+};
 
 
 const userModel = mongoose.model("user", userSchema);
