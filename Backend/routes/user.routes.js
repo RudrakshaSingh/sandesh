@@ -30,15 +30,19 @@ router.post(
 			}
 
 			// Alternatively, if fullname is provided as separate fields, construct it
-			if (req.body["fullname.firstname"] && req.body["fullname.lastname"]) {
+			if (req.body["fullname.firstname"]) {
 				req.body.fullname = {
 					firstname: req.body["fullname.firstname"],
-					lastname: req.body["fullname.lastname"],
 				};
+
+				// Only add lastname if it's provided
+				if (req.body["fullname.lastname"]) {
+					req.body.fullname.lastname = req.body["fullname.lastname"];
+				}
+
 				delete req.body["fullname.firstname"];
 				delete req.body["fullname.lastname"];
 			}
-
 			next();
 		} catch (err) {
 			console.error("Middleware error:", err.message);
@@ -53,6 +57,7 @@ router.post(
 			.isLength({ max: 60 })
 			.withMessage("First name must be at most 60 characters long"),
 		body("fullname.lastname")
+			.optional()
 			.isLength({ min: 3 })
 			.withMessage("Last name must be at least 3 characters long")
 			.isLength({ max: 60 })

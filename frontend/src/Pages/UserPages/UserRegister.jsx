@@ -16,39 +16,61 @@ function UserRegister() {
 	const submitHandler = async (e) => {
 		e.preventDefault();
 
+		// Email validation
 		if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-			alert("Please enter a valid email.");
+			alert("Invalid Email");
 			return;
 		}
 
+		// First Name validation
 		if (firstName.length < 3) {
 			alert("First name must be at least 3 characters long.");
 			return;
 		}
 
-		if (lastName.length < 3) {
-			alert("Last name must be at least 3 characters long.");
+		if (firstName.length > 60) {
+			alert("First name must be at most 60 characters long.");
 			return;
 		}
 
-		if (password.length < 6 || !/[A-Z]/.test(password) || !/[^a-zA-Z0-9]/.test(password)) {
-			alert("Password must be at least 6 characters long, with one uppercase letter and one symbol.");
+		// Last Name validation (optional)
+		if (lastName && (lastName.length < 3 || lastName.length > 60)) {
+			alert("Last name must be at least 3 characters long and at most 60 characters long.");
 			return;
 		}
 
+		// Password validation
+		if (password.length < 6) {
+			alert("Password must be at least 6 characters long.");
+			return;
+		}
+
+		if (password.length > 20) {
+			alert("Password must be at most 20 characters long.");
+			return;
+		}
+
+		if (!/[A-Z]/.test(password) || !/[!@#$&*]/.test(password)) {
+			alert("Password must contain at least one uppercase letter and one symbol.");
+			return;
+		}
+
+		// Confirm Password validation
 		if (password !== confirmPassword) {
 			alert("Passwords do not match.");
 			return;
 		}
 
-		if (!/^\d{10,}$/.test(mobileNumber)) {
-			alert("Mobile number must be at least 10 digits long.");
+		// Mobile Number validation
+		if (!/^\d{10}$/.test(mobileNumber)) {
+			alert("Mobile number must be exactly 10 digits long.");
 			return;
 		}
 
+		// Prepare the fullname object, add lastname only if provided
 		const fullname = {
 			firstname: firstName,
-			lastname: lastName,
+			...(lastName && { lastname: lastName }), // Include lastname only if provided
 		};
 
 		const formData = new FormData();
@@ -73,7 +95,7 @@ function UserRegister() {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},
-				 withCredentials: true, // Add this to send cookies with the request
+				withCredentials: true, // Add this to send cookies with the request
 			});
 			console.log(response.data);
 			navigate("/users/otp");
