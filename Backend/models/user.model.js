@@ -99,7 +99,7 @@ userSchema.methods.deleteUserIfNotVerified = async function () {
       } else {
          console.log(`User ${user.email} is verified, no need for deletion.`);
       }
-   }, 60000); // 1 minute in milliseconds
+   }, 300000); // 5 minute in milliseconds
 };
 
 
