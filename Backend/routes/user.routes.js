@@ -7,6 +7,7 @@ import {
 	loginUser,
 	logoutUser,
 	registerUser,
+	updateUser,
 	verifyCodeVerificationUser,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -125,4 +126,70 @@ router.post(
 
 router.get("/delete", authUser, deleteUser);
 
+router.patch(
+	"/update",upload.single("profileImage"), 
+	[
+	  // Middleware to handle fullname format and parsing
+	  (req, res, next) => {
+		try {
+		  // If fullname is provided as a JSON string, parse it
+		  if (req.body.fullname && typeof req.body.fullname === "string") {
+			try {
+			  req.body.fullname = JSON.parse(req.body.fullname);
+			} catch (err) {
+			  console.error("Error parsing fullname JSON:", err.message);
+			  return res.status(400).json({ message: "Invalid fullname format" });
+			}
+		  }
+  
+		  // Alternatively, if fullname is provided as separate fields, construct it
+		  if (req.body["fullname.firstname"]) {
+			req.body.fullname = {
+			  firstname: req.body["fullname.firstname"],
+			};
+  
+			// Only add lastname if it's provided
+			if (req.body["fullname.lastname"]) {
+			  req.body.fullname.lastname = req.body["fullname.lastname"];
+			}
+  
+			// Remove separate fields after constructing the fullname object
+			delete req.body["fullname.firstname"];
+			delete req.body["fullname.lastname"];
+		  }
+  
+		  // Proceed to the next middleware or route handler
+		  next();
+		} catch (err) {
+		  console.error("Middleware error:", err.message);
+		  return res.status(500).json({ message: "Internal Server Error" });
+		}
+	  },
+  
+	  // Validation to ensure fullname is properly structured
+	  body("fullname")
+		.optional()
+		.isObject()
+		.withMessage("Fullname should be an object")
+		.custom((value) => {
+		  if (value) {
+			if (!value.firstname || typeof value.firstname !== "string") {
+			  throw new Error("First name must be a string");
+			}
+			if (value.lastname && typeof value.lastname !== "string") {
+			  throw new Error("Last name must be a string");
+			}
+		  }
+		  return true;
+		}),
+  
+	  // Optional address validation
+	  body("address")
+		.optional()
+		.isString()
+		.withMessage("Address should be a string"),
+	],authUser,
+	updateUser // The controller method to handle the update
+  );
+  
 export default router;

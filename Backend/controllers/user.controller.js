@@ -231,3 +231,51 @@ export const deleteUser=asyncHandler(async(req,res)=>{
 	throw new ApiError(400, "error in deleting user", error.message);
   }
 })
+
+// Update User
+export const updateUser = async (req, res) => {
+	const { fullname, address } = req.body;
+	const user = await userModel.findById(req.user._id);
+  console.log(req.body);
+  
+	if (!user) {
+	  throw new ApiError(400, "User not found");
+	}
+  
+	// Check if fullname is provided and update firstname and lastname
+	if (fullname) {
+	  if (fullname.firstname) {
+		user.fullname.firstname = fullname.firstname;
+	  }
+  
+	  // Create or update lastname if provided
+	  if (fullname.lastname) {
+		user.fullname.lastname = fullname.lastname;
+	  }
+
+	  
+	}
+  
+	// Update address if provided
+	if (address) {
+	  user.address = address;
+	}
+  
+	// Handle profile image update if provided
+	if (req.file) {
+	  // If a new profile image is uploaded, delete the old one (if not default)
+	  if (user.profileImage !== process.env.DEFAULT_PROFILE_IMAGE_URL) {
+		await deleteOnCloudinary(user.profileImage);
+	  }
+	  // Upload new image to Cloudinary
+	  const profileImage = await uploadOnCloudinary(req.file.path);
+	  user.profileImage = profileImage.url;
+	}
+  
+	// Save the user with the updated details
+	await user.save();
+  
+	// Send response with updated user details
+	return res.status(200).json(new ApiResponse(200, "User updated successfully", user));
+  };
+  
