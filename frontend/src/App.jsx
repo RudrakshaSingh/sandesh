@@ -10,6 +10,7 @@ import UserRegister from "./Pages/UserPages/UserRegister";
 import UserProfile from "./Pages/UserPages/UserProfile";
 import UserForgetPassword from "./Pages/UserPages/UserForgetPassword";
 import UserVerifyCode from "./Pages/UserPages/UserVerifyCode";
+import UserVerifyOtp from "./Pages/UserPages/UserVerifyOtp";
 
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
       <Route path="/users/profile" element={<UserProfile/>}/>
       <Route path="/users/forget" element={<UserForgetPassword/>}/>
       <Route path="/users/otp" element={<UserVerifyCode/>}/>
+      <Route path="/users/verifyotp" element={<UserVerifyOtp/>}/>
 
       
 
