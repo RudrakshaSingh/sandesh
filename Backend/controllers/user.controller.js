@@ -163,7 +163,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 			maxAge: 24 * 60 * 60 * 1000, // 1 day
 		});
 
-		return res.status(200).json(new ApiResponse(200, "User logged in successfully", user));
+
+		return res.status(200).json(new ApiResponse(200, "User logged in successfully", {user,token}));
 	} catch (error) {
 		throw new ApiError(400, "error in login", error.message);
 	}

@@ -4,10 +4,12 @@ import jwt from "jsonwebtoken";
 
 const authUser = async (req, res, next) => {
 	try {
-		const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+		const token = req.cookies.token;
+		console.log("token", token);
+		
 
 		if (!token) {
-			return res.status(401).json({ message: "Unauthorized" });
+			return res.status(401).json({ message: "Unauthorized ff" });
 		}
 
 		const backlisted = await blacklistTokenModel.findOne({ token });

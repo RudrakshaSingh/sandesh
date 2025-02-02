@@ -11,6 +11,8 @@ import UserProfile from "./Pages/UserPages/UserProfile";
 import UserForgetPassword from "./Pages/UserPages/UserForgetPassword";
 import UserVerifyCode from "./Pages/UserPages/UserVerifyCode";
 import UserVerifyOtp from "./Pages/UserPages/UserVerifyOtp";
+import UserHome from "./Pages/UserPages/UserHome";
+import UserProtectedWrapper from "./Pages/UserPages/UserProtectorWrapper";
 
 
 export default function App() {
@@ -26,14 +28,16 @@ export default function App() {
 
 
       {/* User routes */}
+      <Route path="/users/home" element={ <UserProtectedWrapper><UserHome/></UserProtectedWrapper>}/>
       <Route path="/users/register" element={<UserRegister/>}/>
       <Route path="/users/login" element={<UserLogin/>}/>
-      <Route path="/users/profile" element={<UserProfile/>}/>
+      <Route path="/users/profile" element={ <UserProtectedWrapper><UserProfile/></UserProtectedWrapper>}/>
       <Route path="/users/forget" element={<UserForgetPassword/>}/>
       <Route path="/users/otp" element={<UserVerifyCode/>}/>
       <Route path="/users/verifyotp" element={<UserVerifyOtp/>}/>
 
-      
+
+     
 
     </Routes>
     </>

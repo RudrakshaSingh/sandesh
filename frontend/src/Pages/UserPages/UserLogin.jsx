@@ -28,7 +28,9 @@ function UserLogin() {
 
       if (response.status === 200) {
         console.log('Login successful:', response.data);
-      navigate('/');
+        localStorage.setItem("token", response.data.message.token);
+        
+      navigate('/users/home');
 
       }
     } catch (error) {
